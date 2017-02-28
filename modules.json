@@ -1,0 +1,28 @@
+{
+    "left": [
+        {
+            "type": "clock",
+            "refresh": "20s"
+        },
+        {
+            "type": "syu",
+            "refresh": "5m"
+        }       
+    ],
+    "center": [
+        {
+            "type": "ws",
+            "refresh": "1s"
+        }
+    ],
+    "right": [
+         {
+            "type": "netAddr",
+            "refresh": "0s"
+        },
+        {
+            "type": "date",
+            "refresh": "1h"
+        }       
+    ]
+}
