@@ -21,13 +21,13 @@ type Update struct {
 	Content  string
 }
 
-var modtypes = map[string]ModuleHandler{
-	"ws":      ws,
-	"syu":     syu,
-	"clock":   clock,
-	"date":    date,
-	"netAddr": netAddr,
-	"ping":    ping,
+var Modtypes = map[string]ModuleHandler{
+	"ws":      Ws,
+	"syu":     Syu,
+	"clock":   Clock,
+	"date":    Date,
+	"netAddr": NetAddr,
+	"ping":    Ping,
 }
 
 func (d *Duration) UnmarshalJSON(data []byte) error {

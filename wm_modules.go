@@ -8,12 +8,7 @@ import (
 	"unicode"
 )
 
-const (
-	wsFocus   = string('\uf111')
-	wsUnfocus = string('\uf10c')
-)
-
-func ws(m Module) {
+func Ws(m Module) {
 	lastActive := -12
 	re := regexp.MustCompile("([oOfF]\\d)")
 	runOnce := checkDuration(m.Refresh)
@@ -30,10 +25,10 @@ func ws(m Module) {
 		var active int
 		for i, m := range matches {
 			if unicode.IsUpper(rune(m[1][0])) {
-				spaces = append(spaces, wsFocus)
+				spaces = append(spaces, options.WsFocused)
 				active = i
 			} else {
-				spaces = append(spaces, wsUnfocus)
+				spaces = append(spaces, options.WsUnfocused)
 			}
 		}
 		if active != lastActive {

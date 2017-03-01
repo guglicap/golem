@@ -10,29 +10,29 @@ import (
 )
 
 var (
-	defaultInterface *net.Interface
+	defaultNetInterface *net.Interface
 )
 
 func getDefaultInterface() {
 	interfaces, err := net.Interfaces()
 	if err != nil || len(interfaces) < 1 {
-		defaultInterface = nil
+		defaultNetInterface = nil
 		return
 	}
 	for _, i := range interfaces {
 		if !strings.Contains(i.Flags.String(), "LOOPBACK") { //Making assumptions here.
-			defaultInterface = &i
+			defaultNetInterface = &i
 		}
 	}
 }
 
-func netAddr(m Module) {
+func NetAddr(m Module) {
 	runOnce := checkDuration(m.Refresh)
-	if defaultInterface == nil {
+	if defaultNetInterface == nil {
 		return
 	}
 	for {
-		addrs, err := defaultInterface.Addrs()
+		addrs, err := defaultNetInterface.Addrs()
 		if err != nil {
 			out <- Update{m.position, m.index, errorColor(err.Error())}
 		}
@@ -46,22 +46,22 @@ func netAddr(m Module) {
 	}
 }
 
-func ping(m Module) {
+func Ping(m Module) {
 	runOnce := checkDuration(m.Refresh)
 	for {
-		cmd, err := exec.Command("ping", "-c 1", "google.com").Output()
+		cmd, err := exec.Command("ping", "-c 1", options.PingAddr).Output()
 		if err != nil {
 			log.Println(err)
-			out <- Update{m.position, m.index, errorColor("Can't ping shit " + err.Error())}
+			out <- Update{m.position, m.index, errorColor("Can't ping " + options.PingAddr + ", " + err.Error())}
 		}
 		re := regexp.MustCompile("time=(\\d+\\.\\d+ ms)")
 		matches := re.FindStringSubmatch(string(cmd))
 		if len(matches) < 2 {
 			log.Println(matches)
-			out <- Update{m.position, m.index, errorColor("Can't ping ")}
+			out <- Update{m.position, m.index, errorColor("Something went wrong pinging " + options.PingAddr)}
 			return
 		}
-		out <- Update{m.position, m.index, "google.com: " + matches[1]}
+		out <- Update{m.position, m.index, options.PingAddr + ": " + matches[1]}
 		if runOnce {
 			return
 		}

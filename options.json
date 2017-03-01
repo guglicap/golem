@@ -1,0 +1,12 @@
+/* Note that Go uses its own constants for date formats, which can be found here: https://golang.org/pkg/time/#pkg-constants
+ * Some of them: 
+ * 15 -> %H, 03 -> %I
+ * 04 -> %M
+ * 05 -> %S
+ * 2  -> %d
+ * 01 -> %m
+ * 2006 -> %y
+ */
+ {
+
+ }

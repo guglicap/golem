@@ -15,7 +15,6 @@ const (
 	LEFT   = iota
 	CENTER = iota
 	RIGHT  = iota
-	tab    = "        "
 )
 
 func readModules(file []byte) Config {

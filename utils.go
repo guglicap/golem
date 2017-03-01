@@ -4,7 +4,7 @@ import "os/exec"
 import "time"
 
 func inPATH(program string) string {
-	_, err := exec.LookPath("pacman")
+	_, err := exec.LookPath(program)
 	if err != nil {
 		return errorColor("-Syu: Can't find " + program + " in $PATH")
 	}
@@ -12,7 +12,7 @@ func inPATH(program string) string {
 }
 
 func errorColor(s string) string {
-	return "%{F#c98d2c}" + s + "%{F-}"
+	return "%{F" + options.ErrorColor + "}" + s + "%{F-}"
 }
 
 func toTime(d Duration) time.Duration {

@@ -2,10 +2,10 @@ package main
 
 import "time"
 
-func clock(m Module) {
+func Clock(m Module) {
 	runOnce := checkDuration(m.Refresh)
 	for {
-		out <- Update{m.position, m.index, time.Now().Format("15:04")}
+		out <- Update{m.position, m.index, time.Now().Format(options.ClockFormat)}
 		if runOnce {
 			return
 		}
@@ -13,10 +13,10 @@ func clock(m Module) {
 	}
 }
 
-func date(m Module) {
+func Date(m Module) {
 	runOnce := checkDuration(m.Refresh)
 	for {
-		out <- Update{m.position, m.index, time.Now().Format("2/01/2006")}
+		out <- Update{m.position, m.index, time.Now().Format(options.DateFormat)}
 		if runOnce {
 			return
 		}

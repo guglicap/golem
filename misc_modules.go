@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-func padder(m Module) { //Hack-ish
+func Padder(m Module) { //Hack-ish
 	out <- Update{m.position, m.index, ""}
 }
 
-func syu(m Module) {
+func Syu(m Module) {
 	lastCount := -45
 	var count int
 	runOnce := checkDuration(m.Refresh)
