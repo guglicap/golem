@@ -1,0 +1,27 @@
+{
+    "Padding": 8,
+    "ErrorColor": "#c98d2c",
+    "Modules": [
+        {
+            "Handler": "pad",
+            "Position": "left"
+        },
+        {
+            "Handler": "ws",
+            "Position": "center",
+            "Refresh": "1s"
+        },        
+        {
+            "Handler": "ping",
+            "Position": "right",
+            "Refresh": "10s",
+            "Options": {
+                "PingAddress": "google.com"
+            }
+        },
+        {
+            "Handler": "pad",
+            "Position": "right"
+        }
+    ] 
+}

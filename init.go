@@ -3,19 +3,21 @@ package main
 import (
 	"encoding/json"
 	"log"
-)
 
-type Config struct {
-	Left   []Module
-	Center []Module
-	Right  []Module
-}
+	"github.com/guglicap/golem/modules"
+)
 
 const (
 	LEFT   = iota
 	CENTER = iota
 	RIGHT  = iota
 )
+
+type Config struct {
+	ErrorColor string
+	Padding    int
+	Modules    []modules.Module
+}
 
 func readModules(file []byte) Config {
 	var config Config
@@ -26,32 +28,19 @@ func readModules(file []byte) Config {
 	return config
 }
 
-func startModule(bar map[int][]string, m Module, f ModuleHandler) {
-	slice := bar[m.position]
+func startModule(bar map[int][]string, m modules.Module) {
+	slice := bar[m.Position]
 	slice = append(slice, "")
-	bar[m.position] = slice
-	m.index = len(slice) - 1
-	go f(m)
+	bar[m.Position] = slice
+	m.Index = len(slice) - 1
+	m.Run()
 }
 
 func spawnModules(config Config) map[int][]string {
 
 	bar := make(map[int][]string)
-	startModule(bar, Module{"", 0, 0, LEFT}, padder)
-
-	spawnSlice(bar, config.Left, LEFT)
-	spawnSlice(bar, config.Center, CENTER)
-	spawnSlice(bar, config.Right, RIGHT)
-
-	startModule(bar, Module{"", 0, 0, RIGHT}, padder)
-	return bar
-}
-
-func spawnSlice(bar map[int][]string, slice []Module, p int) {
-	for _, m := range slice {
-		if f, ok := modtypes[m.Type]; ok {
-			m.position = p
-			startModule(bar, m, f)
-		}
+	for _, m := range config.Modules {
+		startModule(bar, m)
 	}
+	return bar
 }

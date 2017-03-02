@@ -1,4 +1,4 @@
-package main
+package modules
 
 import (
 	"fmt"
@@ -8,16 +8,15 @@ import (
 	"time"
 )
 
-func Padder(m Module) { //Hack-ish
-	out <- Update{m.position, m.index, ""}
+func padder(m Module) { //Hack-ish
+	output <- Update{m.Position, m.Index, ""}
 }
 
-func Syu(m Module) {
+func syu(m Module) {
 	lastCount := -45
 	var count int
-	runOnce := checkDuration(m.Refresh)
 	if ok := inPATH("pacman"); ok != "" {
-		out <- Update{m.position, m.index, ok}
+		output <- Update{m.Position, m.Index, ok}
 		return
 	}
 	for {
@@ -30,12 +29,12 @@ func Syu(m Module) {
 		}
 		log.Println("pacman output:", string(cmd))
 		if count != lastCount {
-			out <- Update{m.position, m.index, fmt.Sprintf("-Syu: %d", count)}
+			output <- Update{m.Position, m.Index, fmt.Sprintf("-Syu: %d", count)}
 			lastCount = count
 		}
-		if runOnce {
+		if m.runOnce {
 			return
 		}
-		time.Sleep(time.Duration(m.Refresh))
+		time.Sleep(m.refresh)
 	}
 }
