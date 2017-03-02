@@ -1,4 +1,4 @@
-package main
+package modules
 
 import (
 	"os/exec"
@@ -8,10 +8,9 @@ import (
 	"unicode"
 )
 
-func Ws(m Module) {
+func ws(m Module) {
 	lastActive := -12
 	re := regexp.MustCompile("([oOfF]\\d)")
-	runOnce := checkDuration(m.Refresh)
 	for {
 		cmd, err := exec.Command("bspc", "wm", "-g").Output()
 		if err != nil {
@@ -23,21 +22,21 @@ func Ws(m Module) {
 		}
 		var spaces = make([]string, 0)
 		var active int
-		for i, m := range matches {
-			if unicode.IsUpper(rune(m[1][0])) {
-				spaces = append(spaces, options.WsFocused)
+		for i, match := range matches {
+			if unicode.IsUpper(rune(match[1][0])) {
+				spaces = append(spaces, m.options.WsFocused)
 				active = i
 			} else {
-				spaces = append(spaces, options.WsUnfocused)
+				spaces = append(spaces, m.options.WsUnfocused)
 			}
 		}
 		if active != lastActive {
-			out <- Update{m.position, m.index, strings.Join(spaces, " ")}
+			output <- Update{m.Position, m.Index, strings.Join(spaces, " ")}
 			lastActive = active
 		}
-		if runOnce {
+		if m.runOnce {
 			return
 		}
-		time.Sleep(toTime(m.Refresh))
+		time.Sleep(m.refresh)
 	}
 }

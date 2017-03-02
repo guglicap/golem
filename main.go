@@ -6,46 +6,36 @@ import (
 	"log"
 	"os"
 	"strings"
-)
 
-var (
-	out     chan Update
-	options Options
-	tab     string
+	"github.com/guglicap/golem/modules"
 )
 
 const (
-	DEBUG = true
+	DEBUG = false
 )
 
 func main() {
 	if !DEBUG {
-		logFile, err := os.Create("/home/guglielmo/.bin/desktop/gobar.log")
+		logFile, err := os.Create("golem.log")
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer logFile.Close()
 		log.SetOutput(logFile)
 	}
-	if len(os.Args) < 3 {
-		log.Fatal("Usage: golem <config_file> <options_file>")
+	if len(os.Args) < 2 {
+		log.Fatal("Usage: golem <config_file>")
 	}
 	configFile, err := ioutil.ReadFile(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
-	optionsFile, err := ioutil.ReadFile(os.Args[2])
-	if err != nil {
-		log.Fatal(err)
-	}
-	config := readModules(configFile)
-	options = loadOptions(optionsFile)
-	getDefaultInterface()
-	log.Println(defaultNetInterface)
-	tab = strings.Repeat(" ", options.Padding)
-	out = make(chan Update)
-	bar := spawnModules(config)
 
+	config := readModules(configFile)
+	tab := strings.Repeat(" ", config.Padding)
+	out := modules.Init(config.ErrorColor)
+
+	bar := spawnModules(config)
 	for m := range out {
 		bar[m.Position][m.Index] = m.Content
 		for _, k := range [3]int{LEFT, CENTER, RIGHT} {
