@@ -2,39 +2,40 @@ package modules
 
 import (
 	"fmt"
-	"log"
 	"os/exec"
 	"strings"
 	"time"
 )
 
-func padder(m Module) { //Hack-ish
-	output <- Update{m.Position, m.Index, ""}
+func text(m Module) {
+	output <- Update{m.position, m.index, m.options.Text}
 }
 
-func syu(m Module) {
-	lastCount := -45
-	var count int
-	if ok := inPATH("pacman"); ok != "" {
-		output <- Update{m.Position, m.Index, ok}
+func button(m Module) {
+	cmd, txt := m.options.Command, m.options.ButtonText
+	if len(cmd) == 0 {
+		output <- Update{m.position, m.index, colorize(errorColor, "You didn't specify a command.")}
+	}
+	if len(txt) == 0 {
+		txt = cmd
+	}
+	if ok := inPATH(cmd); ok != "" {
+		output <- Update{m.position, m.index, ok}
 		return
 	}
-	for {
-		cmd, err := exec.Command("pacman", "-Qu").Output()
-		if err != nil { //pacman will exit with status 1 when there are no updates.
-			count = 0
-			log.Println("Pacman err", err)
+	output <- Update{m.position, m.index, buttonify(cmd, txt)}
+}
+
+func icontray(m Module) {
+	cmds := strings.Split(m.options.IconTrayCommands, ",")
+	txts := strings.Split(m.options.IconTrayText, ",")
+	result := " "
+	for i, cmd := range cmds {
+		if len(txts) <= i {
+			result += buttonify(cmd, cmd+" ")
 		} else {
-			count = len(strings.Split(string(cmd), "\n")) - 1
+			result += buttonify(cmd, txts[i]+" ")
 		}
-		log.Println("pacman output:", string(cmd))
-		if count != lastCount {
-			output <- Update{m.Position, m.Index, fmt.Sprintf("-Syu: %d", count)}
-			lastCount = count
-		}
-		if m.runOnce {
-			return
-		}
-		time.Sleep(m.refresh)
 	}
+	output <- Update{m.position, m.index, result}
 }

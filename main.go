@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	DEBUG = false
+	DEBUG = false //When true logOutput is set to stdout.
 )
 
 func main() {
@@ -31,14 +31,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	config := readModules(configFile)
+	config := readConfig(configFile)
 	tab := strings.Repeat(" ", config.Padding)
 	out := modules.Init(config.ErrorColor)
 
 	bar := spawnModules(config)
+	//Reads Updates from the channel
 	for m := range out {
-		bar[m.Position][m.Index] = m.Content
-		for _, k := range [3]int{LEFT, CENTER, RIGHT} {
+		bar[m.Position][m.Index] = m.Content            //Sets the corresponding bar "slot" to containt the update we just received
+		for _, k := range [3]int{LEFT, CENTER, RIGHT} { //"Flushes" the array to lemonbar.
 			switch k {
 			case LEFT:
 				fmt.Print("%{l}")

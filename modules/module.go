@@ -2,61 +2,38 @@ package modules
 
 import (
 	"encoding/json"
-	"log"
 	"strings"
 	"time"
 )
 
-type ModuleHandler func(m Module)
-
-type Update struct {
-	Position int
-	Index    int
-	Content  string
-}
-
-var modtypes = map[string]ModuleHandler{
-	"ws":      ws,
-	"syu":     syu,
-	"date":    date,
-	"netAddr": netAddr,
-	"ping":    ping,
-	"pad":     padder,
-}
-
 var (
-	output     chan Update
+	output     chan Update //Channel used to communicate with the main goroutine. Same for all the modules.
 	errorColor string
 )
 
-func Init(errColor string) chan Update {
-	errorColor = errColor
-	output = make(chan Update)
-	getDefaultInterface()
-	return output
-}
-
+//Module corresponds to a "slot" in the bar.
 type Module struct {
-	handler  ModuleHandler
-	Position int
-	Index    int
-	runOnce  bool
-	refresh  time.Duration
-	options  *Options
+	handler  ModuleHandler //Function called by this module on Run. I'm not very proud of how I'm doing this, but hey, it works.
+	position int           //LEFT = 0, CENTER = 1, RIGHT = 2
+	index    int
+	refresh  time.Duration //How often modules refresh. Note that not every module does.
+	runOnce  bool          //When true modules that would normally refresh exit after one iteration.
+	options  *Options      //Also not very proud of how I'm doing this. Holds the options for this module, set to defaultOptions when there are none.
 }
 
+//Run starts the module. I'm bad at comments.
 func (m Module) Run() {
 	go m.handler(m)
 }
 
+//UnmarshalJSON is a custom JSON Unmarshaler for the Module struct
 func (m *Module) UnmarshalJSON(data []byte) error {
 	var temp struct {
 		Handler  string
 		Position string
 		Refresh  string
-		Opts     *Options `json:"Options"`
+		options  *Options
 	}
-	log.Println(temp.Opts, temp)
 	var module Module
 	err := json.Unmarshal(data, &temp)
 	if err != nil {
@@ -66,19 +43,27 @@ func (m *Module) UnmarshalJSON(data []byte) error {
 		module.handler = f
 	} else {
 		module.handler = func(m Module) {
-			output <- Update{m.Position, m.Index, "Can't find module type " + temp.Handler}
+			output <- Update{m.position, m.index, colorize(errorColor, "Can't find module "+temp.Handler)}
 		}
-		return nil
+	}
+	if defOpt, ok := defaultOptions[temp.Handler]; ok {
+		var opts struct {
+			Opts *Options `json:"Options"`
+		}
+		opts.Opts = new(Options)
+		*(opts.Opts) = *defOpt
+		json.Unmarshal(data, &opts)
+		module.options = opts.Opts
 	}
 	switch strings.ToLower(temp.Position) {
 	case "left":
-		module.Position = 0
+		module.position = 0
 	case "center":
-		module.Position = 1
+		module.position = 1
 	case "right":
-		module.Position = 2
+		module.position = 2
 	default:
-		module.Position = 0
+		module.position = -1 //This means we didn't have a Position property in the config and we'll use the last one.
 	}
 	dur, err := time.ParseDuration(temp.Refresh)
 	if err != nil {
@@ -87,11 +72,18 @@ func (m *Module) UnmarshalJSON(data []byte) error {
 		module.refresh = dur
 		module.runOnce = false
 	}
-	if temp.Opts == nil {
-		module.options = defaultOptions
-	} else {
-		module.options = temp.Opts
-	}
 	*m = module
 	return nil
+}
+
+func (m *Module) SetPosition(p int) {
+	m.position = p
+}
+
+func (m *Module) SetIndex(i int) {
+	m.index = i
+}
+
+func (m *Module) GetPosition() int {
+	return m.position
 }

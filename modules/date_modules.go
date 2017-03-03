@@ -4,7 +4,7 @@ import "time"
 
 func date(m Module) {
 	for {
-		output <- Update{m.Position, m.Index, time.Now().Format(m.options.DateFormat)}
+		output <- Update{m.position, m.index, time.Now().Format(m.options.DateFormat)}
 		if m.runOnce {
 			return
 		}

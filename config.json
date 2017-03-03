@@ -3,25 +3,33 @@
     "ErrorColor": "#c98d2c",
     "Modules": [
         {
-            "Handler": "pad",
+            "Handler": "text",
             "Position": "left"
+        },
+        {
+            "Handler": "date",
+            "Position": "left",
+            "Refresh": "20s",
+            "Options": {
+                "DateFormat": "15:04"
+            }
         },
         {
             "Handler": "ws",
             "Position": "center",
             "Refresh": "1s"
-        },        
+        },
         {
-            "Handler": "ping",
+            "Handler": "date",
             "Position": "right",
-            "Refresh": "10s",
+            "Refresh": "1h",
             "Options": {
-                "PingAddress": "google.com"
+                "DateFormat": "23/01/2006"
             }
         },
         {
-            "Handler": "pad",
+            "Handler": "text",
             "Position": "right"
         }
-    ] 
+    ]
 }

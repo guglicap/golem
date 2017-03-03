@@ -1,42 +1,40 @@
 package modules
 
 import (
+	"bufio"
 	"os/exec"
 	"regexp"
-	"strings"
-	"time"
 	"unicode"
 )
 
 func ws(m Module) {
-	lastActive := -12
-	re := regexp.MustCompile("([oOfF]\\d)")
-	for {
-		cmd, err := exec.Command("bspc", "wm", "-g").Output()
-		if err != nil {
-			continue
-		}
-		matches := re.FindAllStringSubmatch(string(cmd), -1)
-		if matches == nil {
-			continue
-		}
-		var spaces = make([]string, 0)
-		var active int
-		for i, match := range matches {
-			if unicode.IsUpper(rune(match[1][0])) {
-				spaces = append(spaces, m.options.WsFocused)
-				active = i
-			} else {
-				spaces = append(spaces, m.options.WsUnfocused)
-			}
-		}
-		if active != lastActive {
-			output <- Update{m.Position, m.Index, strings.Join(spaces, " ")}
-			lastActive = active
-		}
-		if m.runOnce {
-			return
-		}
-		time.Sleep(m.refresh)
+	re := regexp.MustCompile("([oOuUfF]\\d)")
+	if ok := inPATH("bspc"); ok != "" {
+		output <- Update{m.position, m.index, ok}
+		return
 	}
+	cmd := exec.Command("bspc", "subscribe")
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		errOutput(m, err)
+		return
+	}
+	scan := bufio.NewScanner(stdout)
+	err = cmd.Start()
+	result := " "
+	for scan.Scan() {
+		bspc := scan.Text()
+		matches := re.FindAllStringSubmatch(bspc, -1)
+		for _, match := range matches {
+			if unicode.IsUpper(rune(match[1][0])) {
+				result += m.options.WsFocused
+			} else {
+				result += m.options.WsUnfocused
+			}
+			result += " "
+		}
+		output <- Update{m.position, m.index, result}
+		result = " "
+	}
+
 }
