@@ -1,29 +1,28 @@
 package modules
 
 import (
-	"fmt"
-	"os/exec"
+	"errors"
 	"strings"
-	"time"
 )
 
 func text(m Module) {
-	output <- Update{m.position, m.index, m.options.Text}
+	output <- Update{m.slot, m.colors, m.options.Text}
 }
 
 func button(m Module) {
 	cmd, txt := m.options.Command, m.options.ButtonText
 	if len(cmd) == 0 {
-		output <- Update{m.position, m.index, colorize(errorColor, "You didn't specify a command.")}
+		errOutput(m, errors.New("You didn't specify a command."))
+		return
 	}
 	if len(txt) == 0 {
 		txt = cmd
 	}
 	if ok := inPATH(cmd); ok != "" {
-		output <- Update{m.position, m.index, ok}
+		output <- Update{m.slot, m.colors, ok}
 		return
 	}
-	output <- Update{m.position, m.index, buttonify(cmd, txt)}
+	output <- Update{m.slot, m.colors, buttonify(cmd, txt)}
 }
 
 func icontray(m Module) {
@@ -37,5 +36,5 @@ func icontray(m Module) {
 			result += buttonify(cmd, txts[i]+" ")
 		}
 	}
-	output <- Update{m.position, m.index, result}
+	output <- Update{m.slot, m.colors, result}
 }

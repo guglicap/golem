@@ -2,6 +2,7 @@ package modules
 
 import (
 	"encoding/json"
+	"errors"
 	"strings"
 	"time"
 )
@@ -13,12 +14,12 @@ var (
 
 //Module corresponds to a "slot" in the bar.
 type Module struct {
-	handler  ModuleHandler //Function called by this module on Run. I'm not very proud of how I'm doing this, but hey, it works.
-	position int           //LEFT = 0, CENTER = 1, RIGHT = 2
-	index    int
-	refresh  time.Duration //How often modules refresh. Note that not every module does.
-	runOnce  bool          //When true modules that would normally refresh exit after one iteration.
-	options  *Options      //Also not very proud of how I'm doing this. Holds the options for this module, set to defaultOptions when there are none.
+	handler ModuleHandler //Function called by this module on Run. I'm not very proud of how I'm doing this, but hey, it works.
+	slot    Slot
+	refresh time.Duration //How often modules refresh. Note that not every module does.
+	runOnce bool          //When true modules that would normally refresh exit after one iteration.
+	colors  Colors
+	options *Options //Also not very proud of how I'm doing this. Holds the options for this module, set to defaultOptions when there are none.
 }
 
 //Run starts the module. I'm bad at comments.
@@ -32,6 +33,7 @@ func (m *Module) UnmarshalJSON(data []byte) error {
 		Handler  string
 		Position string
 		Refresh  string
+		Colors   Colors
 		options  *Options
 	}
 	var module Module
@@ -43,7 +45,7 @@ func (m *Module) UnmarshalJSON(data []byte) error {
 		module.handler = f
 	} else {
 		module.handler = func(m Module) {
-			output <- Update{m.position, m.index, colorize(errorColor, "Can't find module "+temp.Handler)}
+			errOutput(m, errors.New("Can't find module "+temp.Handler))
 		}
 	}
 	if defOpt, ok := defaultOptions[temp.Handler]; ok {
@@ -55,18 +57,20 @@ func (m *Module) UnmarshalJSON(data []byte) error {
 		json.Unmarshal(data, &opts)
 		module.options = opts.Opts
 	}
+	pos := &module.slot.Position
 	switch strings.ToLower(temp.Position) {
 	case "left":
-		module.position = 0
+		*pos = 0
 	case "center":
-		module.position = 1
+		*pos = 1
 	case "right":
-		module.position = 2
+		*pos = 2
 	default:
-		module.position = -1 //This means we didn't have a Position property in the config and we'll use the last one.
+		*pos = -1 //This means we didn't have a Position property in the config and we'll use the last one.
 	}
+	module.colors = temp.Colors
 	dur, err := time.ParseDuration(temp.Refresh)
-	if err != nil {
+	if err != nil || dur < 1*time.Second {
 		module.runOnce = true
 	} else {
 		module.refresh = dur
@@ -77,13 +81,17 @@ func (m *Module) UnmarshalJSON(data []byte) error {
 }
 
 func (m *Module) SetPosition(p int) {
-	m.position = p
+	m.slot.Position = p
 }
 
 func (m *Module) SetIndex(i int) {
-	m.index = i
+	m.slot.Index = i
+}
+
+func (m *Module) GetIndex() int {
+	return m.slot.Index
 }
 
 func (m *Module) GetPosition() int {
-	return m.position
+	return m.slot.Position
 }

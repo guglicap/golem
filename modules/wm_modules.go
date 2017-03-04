@@ -10,7 +10,7 @@ import (
 func ws(m Module) {
 	re := regexp.MustCompile("([oOuUfF]\\d)")
 	if ok := inPATH("bspc"); ok != "" {
-		output <- Update{m.position, m.index, ok}
+		output <- Update{m.slot, m.colors, ok}
 		return
 	}
 	cmd := exec.Command("bspc", "subscribe")
@@ -33,7 +33,7 @@ func ws(m Module) {
 			}
 			result += " "
 		}
-		output <- Update{m.position, m.index, result}
+		output <- Update{m.slot, m.colors, result}
 		result = " "
 	}
 

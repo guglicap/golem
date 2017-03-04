@@ -6,7 +6,6 @@ import "os/exec"
 func Init(errColor string) chan Update {
 	errorColor = errColor
 	output = make(chan Update)
-	getDefaultInterface()
 	return output
 }
 
@@ -24,11 +23,19 @@ func colorize(color, s string) string {
 	return "%{F" + color + "}" + s + "%{F-}"
 }
 
+func toGBs(blks uint64) int {
+	return int(blks) / 1024 / 1024 / 1024
+}
+
+func toMBs(blks uint64) int {
+	return int(blks) / 1024 / 1024
+}
+
 //NOTE: in order for this to work you need to pipe the output of lemonbar to sh
 func buttonify(command, s string) string {
 	return "%{A:" + command + ":}" + s + "%{A}"
 }
 
 func errOutput(m Module, err error) {
-	output <- Update{m.position, m.index, err.Error()}
+	output <- Update{m.slot, m.colors, err.Error()}
 }

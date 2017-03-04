@@ -5,7 +5,6 @@ type Options struct {
 	//Ws
 	WsFocused   string
 	WsUnfocused string
-
 	//Date
 	DateFormat string
 	//Text
@@ -25,6 +24,11 @@ type Options struct {
 	//IconTray
 	IconTrayCommands string
 	IconTrayText     string
+	//DiskInfo
+	DiskMount      string
+	DiskInfoFormat string
+	//MemInfo
+	MemInfoFormat string
 }
 
 /*func defaultOptions() *Options {
@@ -67,7 +71,7 @@ var defaultOptions = map[string]*Options{
 		ButtonText: "",
 	},
 	"netAddress": &Options{
-		NetInterface: "",
+		NetInterface: "enp3s0",
 	},
 	"whoami": &Options{
 		WhoamiFormat: "\uf2be %uname",
@@ -75,5 +79,12 @@ var defaultOptions = map[string]*Options{
 	"icontray": &Options{
 		IconTrayCommands: "firefox,xterm",
 		IconTrayText:     "\uf269,\uf120",
+	},
+	"diskinfo": &Options{
+		DiskInfoFormat: "%mount: %usePerc",
+		DiskMount:      "/",
+	},
+	"meminfo": &Options{
+		MemInfoFormat: "Memory: %usedMB / %totalMB",
 	},
 }
