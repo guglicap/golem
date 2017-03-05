@@ -2,96 +2,73 @@ package modules
 
 import (
 	"encoding/json"
-	"log"
 	"strings"
 	"time"
 )
 
-type ModuleHandler func(m Module)
-
-type Update struct {
-	Position int
-	Index    int
-	Content  string
-}
-
-var modtypes = map[string]ModuleHandler{
-	"ws":      ws,
-	"syu":     syu,
-	"date":    date,
-	"netAddr": netAddr,
-	"ping":    ping,
-	"pad":     padder,
-}
-
 var (
-	output     chan Update
+	output     chan Update //Channel used to communicate with the main goroutine. Same for all the modules.
 	errorColor string
 )
 
-func Init(errColor string) chan Update {
-	errorColor = errColor
-	output = make(chan Update)
-	getDefaultInterface()
-	return output
+type Module interface {
+	Run()
+	SetPosition(int)
+	GetPosition() int
+	SetIndex(int)
+	GetIndex() int
 }
 
-type Module struct {
-	handler  ModuleHandler
-	Position int
-	Index    int
-	runOnce  bool
-	refresh  time.Duration
-	options  *Options
+type ModuleSpec struct {
+	Handler  string
+	Position string
+	Refresh  string
+	Colors   struct {
+		Background string
+		Foreground string
+	}
+	Options json.RawMessage
 }
 
-func (m Module) Run() {
-	go m.handler(m)
+type ModuleBase struct {
+	slot    Slot
+	refresh time.Duration //How often modules refresh. Note that not every module does.
+	runOnce bool          //When true modules that would normally refresh exit after one iteration.
+	colors  Colors
 }
 
-func (m *Module) UnmarshalJSON(data []byte) error {
-	var temp struct {
-		Handler  string
-		Position string
-		Refresh  string
-		Opts     *Options `json:"Options"`
-	}
-	log.Println(temp.Opts, temp)
-	var module Module
-	err := json.Unmarshal(data, &temp)
-	if err != nil {
-		return err
-	}
-	if f, ok := modtypes[temp.Handler]; ok {
-		module.handler = f
-	} else {
-		module.handler = func(m Module) {
-			output <- Update{m.Position, m.Index, "Can't find module type " + temp.Handler}
-		}
-		return nil
-	}
-	switch strings.ToLower(temp.Position) {
+func (mb *ModuleBase) GetPosition() int {
+	return mb.slot.Position
+}
+func (mb *ModuleBase) SetPosition(i int) {
+	mb.slot.Position = i
+}
+func (mb *ModuleBase) GetIndex() int {
+	return mb.slot.Index
+}
+func (mb *ModuleBase) SetIndex(i int) {
+	mb.slot.Index = i
+}
+
+func buildModuleBase(ms *ModuleSpec) ModuleBase {
+	var mb ModuleBase
+	switch strings.ToLower(ms.Position) {
 	case "left":
-		module.Position = 0
+		mb.slot.Position = 0
 	case "center":
-		module.Position = 1
+		mb.slot.Position = 1
 	case "right":
-		module.Position = 2
+		mb.slot.Position = 2
 	default:
-		module.Position = 0
+		mb.slot.Position = -1
 	}
-	dur, err := time.ParseDuration(temp.Refresh)
-	if err != nil {
-		module.runOnce = true
+	mb.colors = ms.Colors
+	dur, err := time.ParseDuration(ms.Refresh)
+	if err != nil || dur < 1*time.Second {
+		mb.runOnce = true
 	} else {
-		module.refresh = dur
-		module.runOnce = false
+		mb.refresh = dur
+		mb.runOnce = false
 	}
-	if temp.Opts == nil {
-		module.options = defaultOptions
-	} else {
-		module.options = temp.Opts
-	}
-	*m = module
-	return nil
+	return mb
 }
