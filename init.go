@@ -16,12 +16,6 @@ const (
 //lastPosition holds the position of the latest initialized module.
 var lastPosition int
 
-type Config struct {
-	ErrorColor string //Used when outputting errors to the bar.
-	Padding    int    //Space between each module
-	Modules    []modules.Module
-}
-
 func readConfig(file []byte) Config {
 	var config Config
 	err := json.Unmarshal(file, &config)
@@ -31,8 +25,7 @@ func readConfig(file []byte) Config {
 	return config
 }
 
-//startModule sets the module index and, if not specified in the config, position.
-func startModule(bar map[int][]string, m modules.Module) {
+func startBlock(bar map[int][]string, m modules.Module) {
 	pos := m.GetPosition()
 	if pos == -1 {
 		m.SetPosition(lastPosition)
@@ -43,14 +36,14 @@ func startModule(bar map[int][]string, m modules.Module) {
 	bar[pos] = slice
 	m.SetIndex(len(slice) - 1)
 	lastPosition = pos
-	m.Run()
+	go m.Run()
 }
 
 //Initializes the map which holds all of our modules.
 func spawnModules(config Config) map[int][]string {
 	bar := make(map[int][]string)
 	for _, m := range config.Modules {
-		startModule(bar, m)
+		startBlock(bar, m)
 	}
 	return bar
 }

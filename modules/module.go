@@ -2,7 +2,6 @@ package modules
 
 import (
 	"encoding/json"
-	"errors"
 	"strings"
 	"time"
 )
@@ -12,86 +11,64 @@ var (
 	errorColor string
 )
 
-//Module corresponds to a "slot" in the bar.
-type Module struct {
-	handler ModuleHandler //Function called by this module on Run. I'm not very proud of how I'm doing this, but hey, it works.
+type Module interface {
+	Run()
+	SetPosition(int)
+	GetPosition() int
+	SetIndex(int)
+	GetIndex() int
+}
+
+type ModuleSpec struct {
+	Handler  string
+	Position string
+	Refresh  string
+	Colors   struct {
+		Background string
+		Foreground string
+	}
+	Options json.RawMessage
+}
+
+type ModuleBase struct {
 	slot    Slot
 	refresh time.Duration //How often modules refresh. Note that not every module does.
 	runOnce bool          //When true modules that would normally refresh exit after one iteration.
 	colors  Colors
-	options *Options //Also not very proud of how I'm doing this. Holds the options for this module, set to defaultOptions when there are none.
 }
 
-//Run starts the module. I'm bad at comments.
-func (m Module) Run() {
-	go m.handler(m)
+func (mb *ModuleBase) GetPosition() int {
+	return mb.slot.Position
+}
+func (mb *ModuleBase) SetPosition(i int) {
+	mb.slot.Position = i
+}
+func (mb *ModuleBase) GetIndex() int {
+	return mb.slot.Index
+}
+func (mb *ModuleBase) SetIndex(i int) {
+	mb.slot.Index = i
 }
 
-//UnmarshalJSON is a custom JSON Unmarshaler for the Module struct
-func (m *Module) UnmarshalJSON(data []byte) error {
-	var temp struct {
-		Handler  string
-		Position string
-		Refresh  string
-		Colors   Colors
-		options  *Options
-	}
-	var module Module
-	err := json.Unmarshal(data, &temp)
-	if err != nil {
-		return err
-	}
-	if f, ok := modtypes[temp.Handler]; ok {
-		module.handler = f
-	} else {
-		module.handler = func(m Module) {
-			errOutput(m, errors.New("Can't find module "+temp.Handler))
-		}
-	}
-	if defOpt, ok := defaultOptions[temp.Handler]; ok {
-		var opts struct {
-			Opts *Options `json:"Options"`
-		}
-		opts.Opts = new(Options)
-		*(opts.Opts) = *defOpt
-		json.Unmarshal(data, &opts)
-		module.options = opts.Opts
-	}
-	pos := &module.slot.Position
-	switch strings.ToLower(temp.Position) {
+func buildModuleBase(ms *ModuleSpec) ModuleBase {
+	var mb ModuleBase
+	switch strings.ToLower(ms.Position) {
 	case "left":
-		*pos = 0
+		mb.slot.Position = 0
 	case "center":
-		*pos = 1
+		mb.slot.Position = 1
 	case "right":
-		*pos = 2
+		mb.slot.Position = 2
 	default:
-		*pos = -1 //This means we didn't have a Position property in the config and we'll use the last one.
+		mb.slot.Position = -1
 	}
-	module.colors = temp.Colors
-	dur, err := time.ParseDuration(temp.Refresh)
+	mb.colors = ms.Colors
+	dur, err := time.ParseDuration(ms.Refresh)
 	if err != nil || dur < 1*time.Second {
-		module.runOnce = true
+		mb.runOnce = true
 	} else {
-		module.refresh = dur
-		module.runOnce = false
+		mb.refresh = dur
+		mb.runOnce = false
 	}
-	*m = module
-	return nil
-}
-
-func (m *Module) SetPosition(p int) {
-	m.slot.Position = p
-}
-
-func (m *Module) SetIndex(i int) {
-	m.slot.Index = i
-}
-
-func (m *Module) GetIndex() int {
-	return m.slot.Index
-}
-
-func (m *Module) GetPosition() int {
-	return m.slot.Position
+	return mb
 }
