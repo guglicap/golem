@@ -36,6 +36,6 @@ func buttonify(command, s string) string {
 	return "%{A:" + command + ":}" + s + "%{A}"
 }
 
-func errOutput(m Module, err error) {
+func (m *ModuleBase) errOutput(err error) {
 	output <- Update{m.slot, m.colors, err.Error()}
 }

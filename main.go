@@ -50,6 +50,7 @@ func main() {
 	//Reads Updates from the channel
 	for u := range out {
 		//Sets the corresponding bar "slot" to containt the update we just received
+		log.Println(u)
 		bar[u.Slot.Position][u.Slot.Index] = setColors(u)
 		for _, k := range [3]int{LEFT, CENTER, RIGHT} { //"Flushes" the array to lemonbar.
 			switch k {
