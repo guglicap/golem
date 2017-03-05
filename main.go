@@ -11,8 +11,19 @@ import (
 )
 
 const (
-	DEBUG = false
+	DEBUG = true //When true logOutput is set to stdout.
 )
+
+func setColors(u modules.Update) string {
+	result := u.Content
+	if len(u.Color.Background) != 0 {
+		result = "%{B" + u.Color.Background + "}" + result + "%{B-}"
+	}
+	if len(u.Color.Foreground) != 0 {
+		result = "%{F" + u.Color.Foreground + "}" + result + "%{F-}"
+	}
+	return result
+}
 
 func main() {
 	if !DEBUG {
@@ -31,14 +42,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	config := readModules(configFile)
+	config := readConfig(configFile)
 	tab := strings.Repeat(" ", config.Padding)
 	out := modules.Init(config.ErrorColor)
 
 	bar := spawnModules(config)
-	for m := range out {
-		bar[m.Position][m.Index] = m.Content
-		for _, k := range [3]int{LEFT, CENTER, RIGHT} {
+	//Reads Updates from the channel
+	for u := range out {
+		//Sets the corresponding bar "slot" to containt the update we just received
+		log.Println(u)
+		bar[u.Slot.Position][u.Slot.Index] = setColors(u)
+		for _, k := range [3]int{LEFT, CENTER, RIGHT} { //"Flushes" the array to lemonbar.
 			switch k {
 			case LEFT:
 				fmt.Print("%{l}")
