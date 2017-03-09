@@ -2,16 +2,17 @@ package modules
 
 import (
 	"encoding/json"
-	"log"
 	"net"
 	"time"
 )
 
+//NetModule displays the machine IP Address
 type NetModule struct {
 	ModuleBase
 	Interface string
 }
 
+//BuildNet initializes a NetModule
 func BuildNet(ms *ModuleSpec) Module {
 	opts := struct {
 		NetInterface string
@@ -25,6 +26,7 @@ func BuildNet(ms *ModuleSpec) Module {
 	}
 }
 
+//Run starts the module
 func (m *NetModule) Run() {
 	netInterface, err := net.InterfaceByName(m.Interface)
 	if err != nil {
@@ -37,8 +39,7 @@ func (m *NetModule) Run() {
 			m.errOutput(err)
 			return
 		}
-		output <- Update{m.slot, m.colors, addrs[0].String()}
-		log.Println(addrs)
+		output <- m.update(addrs[0].String())
 		if m.runOnce {
 			return
 		}
