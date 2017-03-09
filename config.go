@@ -48,4 +48,6 @@ var buildFuncs = map[string]func(ms *modules.ModuleSpec) modules.Module{
 	"diskinfo": modules.BuildDisk,
 	"launcher": modules.BuildLauncher,
 	"whoami":   modules.BuildWhoami,
+	"cpu":      modules.BuildCPU,
+	"mpd":      modules.BuildMpd,
 }

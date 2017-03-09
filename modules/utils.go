@@ -11,12 +11,12 @@ func Init(errColor string) chan Update {
 
 //inPATH searches for a program in $PATH, if not found returns an error message.
 
-func inPATH(program string) string {
+func inPATH(program string) bool {
 	_, err := exec.LookPath(program)
 	if err != nil {
-		return colorize(errorColor, "Can't find "+program+" in $PATH")
+		return false
 	}
-	return ""
+	return true
 }
 
 func colorize(color, s string) string {
@@ -27,15 +27,11 @@ func toGBs(blks uint64) int {
 	return int(blks) / 1024 / 1024 / 1024
 }
 
-func toMBs(blks uint64) int {
-	return int(blks) / 1024 / 1024
-}
-
 //NOTE: in order for this to work you need to pipe the output of lemonbar to sh
 func buttonify(command, s string) string {
 	return "%{A:" + command + ":}" + s + "%{A}"
 }
 
 func (m *ModuleBase) errOutput(err error) {
-	output <- Update{m.slot, m.colors, err.Error()}
+	output <- m.update(colorize(errorColor, err.Error()))
 }

@@ -1,28 +1,17 @@
 {
     "Padding": 8,
     "ErrorColor": "#c98d2c",
-    "Modules": [
-       {
-           "Handler": "text",
-           "Position": "left"
-       },
-       {
-           "Handler": "netinfo",
-           "Colors": {
-               "Background": "#ffffff",
-               "Foreground": "#000000"
-           }
-       },
-       {
-           "Handler": "date",
-           "Position": "center",
-           "Options": {
-               "Format": "23/01/2006"
-           }
-       },
-       {
-           "Handler": "text",
-           "Position": "right"
-       }
+    "Modules": [               
+        {
+            "Position": "left",
+            "Handler": "text"
+        },        
+        {
+            "Position": "center",            
+            "Handler": "mpd"
+        },                     
+        {
+            "Handler": "text"
+        }
     ]
 }

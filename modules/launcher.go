@@ -5,11 +5,13 @@ import (
 	"strings"
 )
 
+//LauncherModule displays an icon tray
 type LauncherModule struct {
 	ModuleBase
 	Programs, Icons string
 }
 
+//BuildLauncher initializes a LauncherModule
 func BuildLauncher(ms *ModuleSpec) Module {
 	opts := struct {
 		Programs, Icons string
@@ -25,6 +27,7 @@ func BuildLauncher(ms *ModuleSpec) Module {
 	}
 }
 
+//Run starts the module
 func (m *LauncherModule) Run() {
 	cmds := strings.Split(m.Programs, ",")
 	txts := strings.Split(m.Icons, ",")
@@ -36,5 +39,5 @@ func (m *LauncherModule) Run() {
 			result += buttonify(cmd, txts[i]+" ")
 		}
 	}
-	output <- Update{m.slot, m.colors, result}
+	output <- m.update(result)
 }

@@ -6,11 +6,13 @@ import (
 	"strings"
 )
 
+//WhoamiModule displays info about the current user
 type WhoamiModule struct {
 	ModuleBase
 	Format string
 }
 
+//BuildWhoami initializes a WhoamiModule
 func BuildWhoami(ms *ModuleSpec) Module {
 	opts := struct {
 		Format string
@@ -24,6 +26,7 @@ func BuildWhoami(ms *ModuleSpec) Module {
 	}
 }
 
+//Run starts the module
 func (m *WhoamiModule) Run() {
 	u, err := user.Current()
 	if err != nil {
@@ -35,5 +38,5 @@ func (m *WhoamiModule) Run() {
 	result = strings.Replace(result, "%name", u.Name, -1)
 	result = strings.Replace(result, "%gid", u.Gid, -1)
 	result = strings.Replace(result, "%uid", u.Uid, -1)
-	output <- Update{m.slot, m.colors, result}
+	output <- m.update(result)
 }

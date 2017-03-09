@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"flag"
+
 	"github.com/guglicap/golem/modules"
 )
 
@@ -25,7 +27,10 @@ func setColors(u modules.Update) string {
 	return result
 }
 
+var configfl = flag.String("config", "golem.json", "config file")
+
 func main() {
+	flag.Parse()
 	if !DEBUG {
 		logFile, err := os.Create("golem.log")
 		if err != nil {
@@ -34,23 +39,16 @@ func main() {
 		defer logFile.Close()
 		log.SetOutput(logFile)
 	}
-	if len(os.Args) < 2 {
-		log.Fatal("Usage: golem <config_file>")
-	}
-	configFile, err := ioutil.ReadFile(os.Args[1])
+	configFile, err := ioutil.ReadFile(*configfl)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	config := readConfig(configFile)
-	tab := strings.Repeat(" ", config.Padding)
-	out := modules.Init(config.ErrorColor)
-
-	bar := spawnModules(config)
+	bar := spawnModules(readConfig(configFile))
 	//Reads Updates from the channel
+
 	for u := range out {
 		//Sets the corresponding bar "slot" to containt the update we just received
-		log.Println(u)
 		bar[u.Slot.Position][u.Slot.Index] = setColors(u)
 		for _, k := range [3]int{LEFT, CENTER, RIGHT} { //"Flushes" the array to lemonbar.
 			switch k {
@@ -65,4 +63,5 @@ func main() {
 		}
 		fmt.Println()
 	}
+
 }

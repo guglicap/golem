@@ -3,16 +3,19 @@ package modules
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"os/exec"
 	"regexp"
 	"unicode"
 )
 
+//WsModule is a workspace indicator for bspwm.
 type WsModule struct {
 	ModuleBase
 	WsFocused, WsUnfocused string
 }
 
+//BuildWs initializes a WsModule
 func BuildWs(ms *ModuleSpec) Module {
 	opts := struct {
 		WsFocused, WsUnfocused string
@@ -28,10 +31,11 @@ func BuildWs(ms *ModuleSpec) Module {
 	}
 }
 
+//Run starts the module.
 func (m *WsModule) Run() {
 	re := regexp.MustCompile("([oOuUfF]\\d)")
-	if ok := inPATH("bspc"); ok != "" {
-		output <- Update{m.slot, m.colors, ok}
+	if ok := inPATH("bspc"); !ok {
+		m.errOutput(errors.New("Can't find bspc in $PATH"))
 		return
 	}
 	cmd := exec.Command("bspc", "subscribe")
@@ -54,7 +58,7 @@ func (m *WsModule) Run() {
 			}
 			result += " "
 		}
-		output <- Update{m.slot, m.colors, result}
+		output <- m.update(result)
 		result = " "
 	}
 

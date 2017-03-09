@@ -10,28 +10,31 @@ import (
 	"github.com/shirou/gopsutil/disk"
 )
 
+//DiskModule displays infos about disk usage.
 type DiskModule struct {
 	ModuleBase
-	DiskMount, Format string
+	Mount, Format string
 }
 
+//BuildDisk initializes a DiskModule
 func BuildDisk(ms *ModuleSpec) Module {
 	opts := struct {
-		DiskMount, Format string
+		Mount, Format string
 	}{
 		"/", "%mount, %usePerc",
 	}
 	json.Unmarshal([]byte(ms.Options), &opts)
 	return &DiskModule{
 		buildModuleBase(ms),
-		opts.DiskMount,
+		opts.Mount,
 		opts.Format,
 	}
 }
 
+//Run starts the module
 func (m *DiskModule) Run() {
 	for {
-		usage, err := disk.Usage(m.DiskMount)
+		usage, err := disk.Usage(m.Mount)
 		if err != nil {
 			m.errOutput(err)
 			return
@@ -43,7 +46,7 @@ func (m *DiskModule) Run() {
 		result = strings.Replace(result, "%avail", strconv.Itoa(avail), -1)
 		result = strings.Replace(result, "%usePerc", strconv.FormatFloat(usedPerc, 'f', 1, 64)+"%", -1)
 		result = strings.Replace(result, "%mount", usage.Path, -1)
-		output <- Update{m.slot, m.colors, result}
+		output <- m.update(result)
 		if m.runOnce {
 			return
 		}

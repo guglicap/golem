@@ -5,11 +5,13 @@ import (
 	"strings"
 )
 
+//PowerModule displays a set of button to poweroff, suspend or reboot the computer
 type PowerModule struct {
 	ModuleBase
 	Format, PowerOffText, RebootText, SuspendText string
 }
 
+//BuildPower initializes a PowerModule
 func BuildPower(ms *ModuleSpec) Module {
 	opts := struct {
 		Format, PowerOffText, RebootText, SuspendText string
@@ -29,10 +31,11 @@ func BuildPower(ms *ModuleSpec) Module {
 	}
 }
 
+//Run starts the module
 func (m *PowerModule) Run() {
 	result := m.Format
 	result = strings.Replace(result, "%P", buttonify("poweroff", m.PowerOffText), -1)
 	result = strings.Replace(result, "%R", buttonify("reboot", m.RebootText), -1)
 	result = strings.Replace(result, "%S", buttonify("systemctl suspend", m.SuspendText), -1)
-	output <- Update{m.slot, m.colors, result}
+	output <- m.update(result)
 }
