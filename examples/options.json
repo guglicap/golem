@@ -1,0 +1,41 @@
+{
+    "Padding": 8,
+    "ErrorColor": "#c98d2c",
+    "Modules": [
+        {
+            "Position": "left",
+            "Handler": "text"
+        },
+        {
+            "Handler": "date",
+            "Refresh": "20s",
+            "Options": {
+                "Format": "15:04"
+            }
+        },
+        {
+            "Handler": "mpd"           
+        },        
+        {
+            "Position": "center",
+            "Handler": "ws"
+        },
+        {
+            "Position": "right",
+            "Handler": "cpu",
+            "Refresh": "2s"
+        },
+        {            
+            "Handler": "power",
+            "Options": {
+                "Format": "%S  %R  %P"
+            }
+        },
+        {
+            "Handler": "whoami"
+        },
+        {
+            "Handler": "text"
+        }
+    ]
+}
