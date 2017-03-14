@@ -2,13 +2,12 @@ package modules
 
 import (
 	"errors"
-	"log"
 
 	"strings"
 
 	"encoding/json"
 
-	"io"
+	"time"
 
 	"github.com/fhs/gompd/mpd"
 )
@@ -34,7 +33,7 @@ func BuildMpd(ms *ModuleSpec) Module {
 		"\uf04e",
 		"\uf04c",
 		"\uf04b",
-		":6060",
+		":6600",
 		"",
 	}
 	json.Unmarshal([]byte(ms.Options), &opts)
@@ -61,56 +60,72 @@ func (m *MpdModule) Run() {
 		m.errOutput(errors.New("Can't find mpc in $PATH"))
 		return
 	}
-	w, err := mpd.NewWatcher("tcp", ":6600", "", "player")
+	w, err := mpd.NewWatcher("tcp", m.Address, m.Password, "player")
 	if err != nil {
 		m.errOutput(err)
 		return
 	}
-	c, err := mpd.Dial("tcp", ":6600")
+	defer w.Close()
+	c, err := mpd.Dial("tcp", m.Address)
 	if err != nil {
 		m.errOutput(err)
 		return
 	}
+	q := make(chan bool)
+	e := keepAlive(q, c) //Keep the connection to mpd alive
+	defer func() {
+		q <- true
+	}() //Ensure the keepAlive goroutine stops when this one stops
+	var result, song, toggle string
 	for {
-		var result, song, toggle string
-		st, err := c.Status()
-		if err != nil {
-			if err == io.EOF {
-				<-w.Event
-				continue
-			}
-			m.errOutput(err)
-			return
-		}
+		st, _ := c.Status() //Ignore errors, keepAlive will tell us in case something's wrong
 		switch st["state"] {
 		case "play":
 			toggle = m.TogglePlaying
 		case "pause":
 			toggle = m.TogglePaused
-		case "stop":
-			output <- m.update("Stopped.")
-			<-w.Event //Waits for mpd to start playing again.
-			continue  //Then start from the top of the loop
 		}
+		//Place our buttons
 		result = strings.Replace(m.Format, "%prev", buttonify("mpc prev", m.PrevButton), -1)
 		result = strings.Replace(result, "%next", buttonify("mpc next", m.NextButton), -1)
-
 		result = strings.Replace(result, "%toggle", buttonify("mpc toggle", toggle), -1)
-		s, err := c.CurrentSong()
-		if err != nil {
-			if err == io.EOF {
-				<-w.Event
-				continue
-			}
-			m.errOutput(err)
-			return
-		}
+		//Get current song info
+		s, _ := c.CurrentSong()
 		song = strings.Replace(m.SongFormat, "%title", s["Title"], -1)
 		song = strings.Replace(song, "%artist", s["Artist"], -1)
 		song = strings.Replace(song, "%album", s["Album"], -1)
+		//Put it all together
 		result = strings.Replace(result, "%song", song, -1)
-		log.Println(result)
+		if st["state"] == "stop" {
+			result = "mpd stopped."
+		}
 		output <- m.update(result)
-		<-w.Event //Blocks until something happens
+		select {
+		case <-w.Event: //wait for something to happen
+			break
+		case err := <-e: //we couldn't connect to mpd, stop.
+			m.errOutput(err)
+			return
+		}
 	}
+}
+
+//Apparently, this is needed because mpd will close our connection after some time of inactivity
+func keepAlive(quit chan bool, c *mpd.Client) chan error {
+	e := make(chan error)
+	go func() {
+		t := time.NewTicker(45 * time.Second) //mpd default timeout is one minute
+		for {
+			select {
+			case <-t.C:
+				err := c.Ping()
+				if err != nil {
+					e <- err
+				}
+			case <-quit:
+				return
+			}
+		}
+	}()
+	return e
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/shirou/gopsutil/disk"
 )
 
-//DiskModule displays infos about disk usage.
+//DiskModule displays info about disk usage.
 type DiskModule struct {
 	ModuleBase
 	Mount, Format string
@@ -21,7 +21,7 @@ func BuildDisk(ms *ModuleSpec) Module {
 	opts := struct {
 		Mount, Format string
 	}{
-		"/", "%mount, %usePerc",
+		"/", "%mount: %usedGB/%sizeGB",
 	}
 	json.Unmarshal([]byte(ms.Options), &opts)
 	return &DiskModule{

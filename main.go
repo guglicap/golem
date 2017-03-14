@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	DEBUG = true //When true logOutput is set to stdout.
+	DEBUG = false //When true logOutput is set to stdout.
 )
 
 func setColors(u modules.Update) string {
