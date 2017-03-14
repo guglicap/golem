@@ -48,7 +48,29 @@ All of the top-level fields are required, while you can edit the `Modules` array
 
 Here's a list of handlers.  
 Most of them can be used with default options.  
-For a list of options supported by a module, click on the link.
+For a list of options supported by the module, click on the link.
 
 
-* [cpu](https://github.com/guglicap/golem/blob/develop/modules/MODULES.md#cpu)
+* [cpu](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#cpu)
+
+* [date](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#date)
+
+* [disk](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#disk)
+
+* [launcher](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#launcher)
+
+* [mem](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#mem)
+
+* [text](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#text)
+
+* [button](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#button)
+
+* [mpd](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#mpd)
+
+* [net](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#net)
+
+* [power](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#power)
+
+* [whoami](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#whoami)
+
+* [ws](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#ws)
