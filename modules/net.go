@@ -15,14 +15,14 @@ type NetModule struct {
 //BuildNet initializes a NetModule
 func BuildNet(ms *ModuleSpec) Module {
 	opts := struct {
-		NetInterface string
+		Interface string
 	}{
 		"enp3s0",
 	}
 	json.Unmarshal([]byte(ms.Options), &opts)
 	return &NetModule{
 		buildModuleBase(ms),
-		opts.NetInterface,
+		opts.Interface,
 	}
 }
 
