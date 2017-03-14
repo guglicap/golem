@@ -33,7 +33,7 @@ Displays the current date/time.
       *  "15:04" hour:minute
       *  "02/01/2006" dd/mm/yyyy
 
-      **Default is "02/01/2006 15:04"**
+  **Default is "02/01/2006 15:04"**
 
 
 # disk
@@ -96,7 +96,7 @@ Displays information about current Virtual Memory usage.
 
        * "%usePerc": Percentage of memory used.
 
-       **Default is %usedMB / %totalMB**
+  **Default is %usedMB / %totalMB**
 
 
 # text
@@ -196,6 +196,8 @@ Displays a powertray.
   
      * "%S": Suspend button.
 
+  **Default is "%P"**
+
    * **PowerOffText**  
 Text to use for the poweroff button.  
  Can be an icon.  
@@ -257,5 +259,3 @@ Icon to use for the active desktop.
    * **WsUnfocused**  
 Icon to use for the inactive desktops.  
 **Default is "\uf10c"** 
-    
-    
