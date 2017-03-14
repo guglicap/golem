@@ -1,8 +1,8 @@
-##Golem
+## Golem
 
 Go program to generate input for [lemonbar](https://github.com/LemonBoy/bar)
 
-###Installation
+### Installation
 
 * If you already have Go installed:
     `go get github.com/guglicap/golem`
@@ -17,7 +17,7 @@ Go program to generate input for [lemonbar](https://github.com/LemonBoy/bar)
 
 You should now have a binary file `$GOPATH/bin/golem`
 
-###Usage
+### Usage
 
 `golem -config [config]`
 
@@ -27,7 +27,7 @@ Note that you need to pipe that into lemonbar. Here's an example from my setup:
 
 FontAwesome is recommmended, as most defaults use it. It is also recommmended to pipe the output to `sh`.
 
-###Configuration 
+### Configuration 
 
 Golem requires a json encoded config file. See the [example](https://github.com/guglicap/golem/blob/master/config.json).  
 All of the top-level fields are required, while you can edit the `Modules` array to customize the look of your bar. Every module is encoded in this form:
@@ -44,11 +44,11 @@ All of the top-level fields are required, while you can edit the `Modules` array
          }
     }          
 
-###Handlers
+### Handlers
 
 Here's a list of handlers.  
 Most of them can be used with default options.  
 For a list of options supported by a module, click on the link.
 
 
-* [cpu](https://github.com/guglicap/golem/blob/master/modules/MODULES.md#cpu)
+* [cpu](https://github.com/guglicap/golem/blob/develop/modules/MODULES.md#cpu)

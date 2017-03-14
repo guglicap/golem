@@ -1,7 +1,7 @@
-#cpu
+# cpu
 Displays information about the current CPU usage.
 
-###Options
+### Options
 
 * **Format**
 
@@ -21,10 +21,10 @@ Displays information about the current CPU usage.
    When`true`displays statistics for every cpu. On a quad core machine, for example, the output will contain cpu0, cpu1, cpu2, cpu3.  
    **Default is true.**
 
-#date
+# date
 Displays the current date/time.
 
-## Options
+### Options
 
    * **Format**
      
@@ -36,11 +36,11 @@ Displays the current date/time.
       **Default is "02/01/2006 15:04"**
 
 
-#disk
+# disk
 
 Displays info about disk usage.
 
-###Options 
+### Options 
 
    * **Mountpoint**  
       Set the mountpoint of the filesystem.  
@@ -62,11 +62,11 @@ Displays info about disk usage.
 
 
 
-#launcher
+# launcher
 
 Displays an icon tray.
 
-###Options 
+### Options 
 
    * **Programs**       
       Comma separated list of commands.  
@@ -78,11 +78,11 @@ Displays an icon tray.
     An underscore uses the program name as icon.  
     **Default is "\uf269"**
 
-#mem
+# mem
 
 Displays information about current Virtual Memory usage.  
 
-###Options
+### Options
 
    * **Format**
       
@@ -99,20 +99,20 @@ Displays information about current Virtual Memory usage.
        **Default is %usedMB / %totalMB**
 
 
-#text
+# text
 
 Displays a text and returns. It's also useful to pad the bar content, have a look at the example config file.
 
-###Options 
+### Options 
 
    * **Text**  
  The text to display.
 
-#button
+# button
 
 Displays a button.
 
-###Options
+### Options
      
    * **Command**   
      The command to run on button pressed.
@@ -120,11 +120,11 @@ Displays a button.
    * **Text**  
      Text to be used as button. It can, of course, be a FontAwesome icon. 
 
-#mpd
+# mpd
 
 Displays mpd related info and controls. You also need to have`mpc`installed in order for this to work.
 
-###Options
+### Options
 
    * **Format**
      
@@ -172,21 +172,21 @@ mpd server address
  mpd server password  
 **Default is ""**
 
-#net
+# net
 
 Displays the machine IP address
 
-###Options
+### Options
 
    * **Interface**  
 The network interface.  
 **Default is "enp3s0"**
 
-#power
+# power
 
 Displays a powertray.
 
-###Options
+### Options
 
    * **Format**
    
@@ -223,11 +223,11 @@ Command to reboot the pc.
 Command to suspend the pc.  
 **Default is "systemctl suspend"**
 
-#whoami
+# whoami
 
 Displays info about the current user
 
-###Options
+### Options
 
    * **Format**  
   
@@ -243,11 +243,11 @@ Displays info about the current user
    **Default is "%uname"**
 
 
-#ws
+# ws
 
 Displays a workspace indicator, it's currently only working for bspwm.
 
-####Options
+### Options
 
    * **WsFocused**  
 Icon to use for the active desktop.  
