@@ -1,4 +1,4 @@
-![golem](https://github.com/guglicap/golem/blob/master/examples/defaults.png)
+![golem](https://github.com/guglicap/golem/blob/master/pics/defaults.png)
 
 ## Golem
 
