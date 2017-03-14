@@ -1,3 +1,5 @@
+![golem](https://github.com/guglicap/golem/blob/master/examples/defaults.png)
+
 ## Golem
 
 Go program to generate input for [lemonbar](https://github.com/LemonBoy/bar)
@@ -29,7 +31,7 @@ FontAwesome is recommmended, as most defaults use it. It is also recommmended to
 
 ### Configuration 
 
-Golem requires a json encoded config file. See the [example](https://github.com/guglicap/golem/blob/master/config.json).  
+Golem requires a json encoded config file. See the [examples](https://github.com/guglicap/golem/blob/master/examples/).  
 All of the top-level fields are required, while you can edit the `Modules` array to customize the look of your bar. Every module is encoded in this form:
 
     {

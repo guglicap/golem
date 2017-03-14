@@ -1,0 +1,40 @@
+{
+    "Padding": 8,
+    "ErrorColor": "#c98d2c",
+    "comment": "You can add comments like this.",
+    "Modules": [               
+        {
+            "Position": "left",
+            "Handler": "text",
+            "comment": "this is used to pad the bar content"
+        },       
+
+        {
+            "comment": "if you don't specify a position, it is assumed to be the same as the last module",
+            "Handler": "mpd"            
+        },
+        {
+            "Handler": "mem",
+            "Refresh": "2s",
+            "comment": "if refresh is omitted, the module will only run once."
+        },
+        {
+            "Handler": "cpu",
+            "Refresh": "2s"
+        },
+        {
+            "Position": "center",
+            "Handler": "ws"
+        },
+        {
+            "Position": "right",
+            "Handler": "date"
+        },
+        {
+            "Handler": "whoami"            
+        },        
+        {
+            "Handler": "text"
+        }
+    ]
+}
