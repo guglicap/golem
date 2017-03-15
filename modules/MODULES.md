@@ -247,7 +247,7 @@ Displays info about the current user
 
 # ws
 
-Displays a workspace indicator, it's currently only working for bspwm.
+Displays a workspace indicator
 
 ### Options
 
@@ -259,3 +259,11 @@ Icon to use for the active desktop.
    * **WsUnfocused**  
 Icon to use for the inactive desktops.  
 **Default is "\uf10c"** 
+
+   * **Wm**      
+      
+      * "bspwm"
+
+      * "i3"
+
+  **Default is "bspwm"**
