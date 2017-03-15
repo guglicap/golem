@@ -2,4 +2,5 @@ golem
 golem.json
 golem.log
 debug
+config.json
 .vscode
