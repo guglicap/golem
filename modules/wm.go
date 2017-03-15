@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"unicode"
 
-	"github.com/proxypoke/i3ipc"
+	"github.com/guglicap/i3ipc"
 )
 
 func (m *WsModule) bspwm() {
@@ -42,6 +42,7 @@ func (m *WsModule) bspwm() {
 }
 
 func (m *WsModule) i3() {
+	i3ipc.Init() //I know this sucks
 	sock, err := i3ipc.GetIPCSocket()
 	if err != nil {
 		m.errOutput(err)
